@@ -2,6 +2,8 @@ package de.ph1b.audiobook.features.bookOverview
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
 import android.support.annotation.DrawableRes
@@ -69,7 +71,25 @@ class BookShelfController : MvpBaseController<BookShelfController, BookShelfPres
 
     // init fab
     fab.setIconDrawable(playPauseDrawable)
-    fab.setOnClickListener { presenter.playPauseRequested() }
+    fab.setOnClickListener {
+      val duration = currentBook?.globalDuration ?: 100
+      val position = currentBook?.globalPosition() ?: 0
+
+      // use a margin of 5 seconds
+      if (currentBook != null && position + 5000 >= duration) {
+        val builder = AlertDialog.Builder(view.context)
+        val dialog = builder.setTitle("Replay from the start?")
+                .setPositiveButton("Yes", DialogInterface.OnClickListener {
+                  dialog, which ->
+                  presenter.playPauseRequested()
+                })
+                .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which -> })
+                .create()
+        dialog.show()
+      } else {
+        presenter.playPauseRequested()
+      }
+    }
 
     // init RecyclerView
     recyclerView.setHasFixedSize(true)
@@ -263,6 +283,10 @@ class BookShelfController : MvpBaseController<BookShelfController, BookShelfPres
     val galleryPickerIntent = Intent(Intent.ACTION_PICK)
     galleryPickerIntent.type = "image/*"
     startActivityForResult(galleryPickerIntent, COVER_FROM_GALLERY)
+  }
+
+  override fun onFileDeleted(book: Book) {
+    adapter.deleteBook(book.id)
   }
 
   enum class DisplayMode(@DrawableRes val icon: Int) {

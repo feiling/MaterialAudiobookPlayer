@@ -1,6 +1,8 @@
 package de.ph1b.audiobook.playback
 
 import android.content.Context
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
@@ -80,7 +82,10 @@ constructor(
           v { "Reached last track. Stopping player" }
           playStateManager.playState = PlayState.STOPPED
 
-          state = State.PLAYBACK_COMPLETED
+          // reset so that play/pause button on headphones won't replay from the start.
+          bookSubject = BehaviorSubject.create<Book>()
+          player.reset()
+          state = State.IDLE
         }
       }
     }

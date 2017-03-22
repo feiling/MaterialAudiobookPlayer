@@ -1,6 +1,8 @@
 package de.ph1b.audiobook.features.bookOverview
 
+import android.app.AlertDialog
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialog
 import android.support.design.widget.BottomSheetDialogFragment
@@ -44,6 +46,7 @@ class EditBookBottomSheet : BottomSheetDialogFragment() {
     val internetCover = view.findViewById(R.id.internetCover) as TextView
     val fileCover = view.findViewById(R.id.fileCover) as TextView
     val bookmark = view.findViewById(R.id.bookmark) as TextView
+    val delete = view.findViewById(R.id.delete) as TextView
     dialog.setContentView(view)
 
     title.setOnClickListener {
@@ -64,6 +67,29 @@ class EditBookBottomSheet : BottomSheetDialogFragment() {
         .show(fragmentManager, BookShelfController.TAG)
       dismiss()
     }
+
+    val c = callback()
+    delete.setOnClickListener {
+      val builder = AlertDialog.Builder(context)
+      builder.setTitle("Do you want to delete the book?")
+              .setMessage(book.name)
+              .setCancelable(false)
+              .setPositiveButton("Yes", DialogInterface.OnClickListener {
+                dialog, which ->
+                  book.delete()
+                  c.onFileDeleted(book)
+                  dialog.cancel()
+              })
+              .setNegativeButton("No", DialogInterface.OnClickListener {
+                dialog, which -> dialog.cancel()
+              })
+
+
+      var dialog = builder.create()
+      dialog.show()
+      dismiss()
+    }
+
 
     tintLeftDrawable(title)
     tintLeftDrawable(internetCover)
@@ -95,5 +121,6 @@ class EditBookBottomSheet : BottomSheetDialogFragment() {
   interface Callback {
     fun onInternetCoverRequested(book: Book)
     fun onFileCoverRequested(book: Book)
+    fun onFileDeleted(book: Book)
   }
 }

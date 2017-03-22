@@ -35,4 +35,8 @@
         android:drawableStart="@drawable/bookmark"
         android:text="@string/bookmark"/>
 
+    <TextView
+        android:id="@+id/delete"
+        style="@style/BottomSheetRow"
+        android:text="Delete" />
 </LinearLayout>

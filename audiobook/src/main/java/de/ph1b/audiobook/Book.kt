@@ -104,4 +104,10 @@ data class Book(
     SINGLE_FOLDER,
     SINGLE_FILE
   }
+
+  fun delete() {
+    chapters.forEach {
+      it.delete()
+    }
+  }
 }

@@ -1,5 +1,7 @@
 package de.ph1b.audiobook.features.bookPlaying
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
 import android.view.*
@@ -86,7 +88,27 @@ class BookPlayController(bundle: Bundle) : BaseController(bundle) {
     cover = view.find(R.id.cover)
     toolbar = view.find(R.id.toolbar)
 
-    play.setOnClickListener { mediaPlayer.playPause() }
+    book = repo.bookById(bookId)
+
+    play.setOnClickListener {
+      val duration = book?.globalDuration ?: 100
+      val position = book?.globalPosition() ?: 0
+
+      // use a margin of 5 seconds
+      if (book !=null && position + 5000 >= duration) {
+        val builder = AlertDialog.Builder(view.context)
+        val dialog = builder.setTitle("Replay from the start?")
+                .setPositiveButton("Yes", DialogInterface.OnClickListener {
+                  dialog, which -> mediaPlayer.playPause()
+                })
+                .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which -> })
+                .create()
+        dialog.show()
+      }
+      else {
+        mediaPlayer.playPause()
+      }
+    }
     rewind.setOnClickListener { mediaPlayer.rewind() }
     fastForward.setOnClickListener { mediaPlayer.fastForward() }
     next.setOnClickListener { mediaPlayer.next() }
@@ -105,7 +127,7 @@ class BookPlayController(bundle: Bundle) : BaseController(bundle) {
       .doOnNext { lastClick = 0 } // resets so triple clicks won't cause another invoke
       .subscribe { mediaPlayer.playPause() }
 
-    book = repo.bookById(bookId)
+
 
     //setup buttons
     play.setIconDrawable(playPauseDrawable)

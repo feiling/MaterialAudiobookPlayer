@@ -17,4 +17,11 @@ data class Chapter(val file: File, val name: String, val duration: Int, val file
   override fun compareTo(other: Chapter): Int {
     return NaturalOrderComparator.fileComparator.compare(file, other.file)
   }
+
+  /**
+   * Deletes the chapter file
+   */
+  fun delete() {
+    file.delete()
+  }
 }

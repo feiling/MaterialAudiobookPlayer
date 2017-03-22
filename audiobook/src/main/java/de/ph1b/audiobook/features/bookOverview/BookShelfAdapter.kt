@@ -76,6 +76,11 @@ class BookShelfAdapter(private val c: Context, private val bookClicked: (Book, C
     }
   }
 
+  fun  deleteBook(bookId: Long) {
+    books.removeIf { it.id == bookId }
+    notifyDataSetChanged();
+  }
+
   override fun getItemId(position: Int) = books[position].id
 
   fun getItem(position: Int): Book = books[position]
